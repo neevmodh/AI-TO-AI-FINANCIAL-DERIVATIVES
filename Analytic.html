@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics | Project Ares</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0e17;
+            --secondary-bg: #131a2a;
+            --card-bg: #1e293b;
+            --accent-cyan: #00f5d4;
+            --accent-purple: #7b61ff;
+            --accent-pink: #ec4899;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background-color: rgba(10, 14, 23, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            color: var(--accent-cyan);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--text-primary);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-cyan);
+            border-radius: 2px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+        }
+
+        .pulse {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .pulse::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 3rem 2rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        /* Analytics Dashboard */
+        .analytics-dashboard {
+            padding: 0 2rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 245, 212, 0.2);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .kpi-1::before { background: linear-gradient(90deg, var(--accent-cyan), #00b894); }
+        .kpi-2::before { background: linear-gradient(90deg, var(--accent-purple), #6c5ce7); }
+        .kpi-3::before { background: linear-gradient(90deg, var(--accent-pink), #fd79a8); }
+        .kpi-4::before { background: linear-gradient(90deg, var(--success), #27ae60); }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .kpi-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .icon-1 { background: rgba(0, 245, 212, 0.1); color: var(--accent-cyan); }
+        .icon-2 { background: rgba(123, 97, 255, 0.1); color: var(--accent-purple); }
+        .icon-3 { background: rgba(236, 72, 153, 0.1); color: var(--accent-pink); }
+        .icon-4 { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .change-positive {
+            color: var(--success);
+        }
+
+        .change-negative {
+            color: var(--error);
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .chart-container:hover {
+            border-color: rgba(0, 245, 212, 0.2);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-btn {
+            padding: 0.5rem 1rem;
+            background: var(--secondary-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+        }
+
+        .chart-btn.active {
+            background: var(--accent-cyan);
+            color: var(--primary-bg);
+            border-color: var(--accent-cyan);
+        }
+
+        .chart {
+            height: 300px;
+            position: relative;
+        }
+
+        /* Performance Metrics */
+        .performance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .performance-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .performance-card:hover {
+            border-color: rgba(0, 245, 212, 0.2);
+        }
+
+        .performance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .performance-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .performance-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .performance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .performance-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .agent-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .avatar-risk { background: linear-gradient(135deg, var(--accent-cyan), #00b894); }
+        .avatar-market { background: linear-gradient(135deg, var(--accent-purple), #6c5ce7); }
+        .avatar-hedge { background: linear-gradient(135deg, var(--accent-pink), #fd79a8); }
+
+        .agent-details h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .agent-details p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .performance-metric {
+            text-align: right;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Risk Distribution */
+        .risk-distribution {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .distribution-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .distribution-card:hover {
+            border-color: rgba(0, 245, 212, 0.2);
+        }
+
+        .distribution-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .distribution-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .distribution-chart {
+            height: 200px;
+            position: relative;
+        }
+
+        /* System Health */
+        .system-health {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .health-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .health-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 245, 212, 0.2);
+        }
+
+        .health-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+
+        .health-1 { background: rgba(0, 245, 212, 0.1); color: var(--accent-cyan); }
+        .health-2 { background: rgba(123, 97, 255, 0.1); color: var(--accent-purple); }
+        .health-3 { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+
+        .health-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .health-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+            }
+            
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0);
+            }
+            50% {
+                transform: translate(20px, 20px);
+            }
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .performance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .risk-distribution {
+                grid-template-columns: 1fr;
+            }
+
+            .system-health {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .system-health {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .status-indicator {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="background-effects">
+        <div class="grid-pattern"></div>
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-robot logo-icon"></i>
+            <span>ARES</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="Live.html">Live Markets</a></li>
+                <li><a href="agents.html">Agent Network</a></li>
+                <li><a href="Analytic.html" class="active">Analytics</a></li>
+                <li><a href="docs.html">Documentation</a></li>
+            </ul>
+        </nav>
+        <div class="status-indicator">
+            <div class="pulse"></div>
+            <span>System Online</span>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>ANALYTICS DASHBOARD</h1>
+        <p>Comprehensive insights into market performance, agent effectiveness, and system health</p>
+    </section>
+
+    <!-- Analytics Dashboard -->
+    <section class="analytics-dashboard">
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card kpi-1">
+                <div class="kpi-header">
+                    <div class="kpi-title">Total Volume</div>
+                    <div class="kpi-icon icon-1">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                </div>
+                <div class="kpi-value">$18.4M</div>
+                <div class="kpi-change change-positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+4.2%</span>
+                </div>
+            </div>
+
+            <div class="kpi-card kpi-2">
+                <div class="kpi-header">
+                    <div class="kpi-title">Active Contracts</div>
+                    <div class="kpi-icon icon-2">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                </div>
+                <div class="kpi-value">1,247</div>
+                <div class="kpi-change change-positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+2.1%</span>
+                </div>
+            </div>
+
+            <div class="kpi-card kpi-3">
+                <div class="kpi-header">
+                    <div class="kpi-title">Avg. Premium</div>
+                    <div class="kpi-icon icon-3">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+                <div class="kpi-value">$3,842</div>
+                <div class="kpi-change change-negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-1.3%</span>
+                </div>
+            </div>
+
+            <div class="kpi-card kpi-4">
+                <div class="kpi-header">
+                    <div class="kpi-title">Settlement Rate</div>
+                    <div class="kpi-icon icon-4">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                </div>
+                <div class="kpi-value">99.7%</div>
+                <div class="kpi-change change-positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0.2%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title">Market Volume Trend</div>
+                    <div class="chart-actions">
+                        <button class="chart-btn active">1D</button>
+                        <button class="chart-btn">1W</button>
+                        <button class="chart-btn">1M</button>
+                        <button class="chart-btn">1Y</button>
+                    </div>
+                </div>
+                <div class="chart">
+                    <canvas id="volumeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title">Risk Distribution</div>
+                    <div class="chart-actions">
+                        <button class="chart-btn active">All</button>
+                        <button class="chart-btn">Active</button>
+                    </div>
+                </div>
+                <div class="chart">
+                    <canvas id="riskChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="performance-grid">
+            <div class="performance-card">
+                <div class="performance-header">
+                    <div class="performance-title">Top Performing Agents</div>
+                    <div class="chart-actions">
+                        <button class="chart-btn active">This Week</button>
+                        <button class="chart-btn">All Time</button>
+                    </div>
+                </div>
+                <div class="performance-list">
+                    <div class="performance-item">
+                        <div class="agent-info">
+                            <div class="agent-avatar avatar-risk">RS</div>
+                            <div class="agent-details">
+                                <h4>Risk Sensor #42</h4>
+                                <p>Weather Detection</p>
+                            </div>
+                        </div>
+                        <div class="performance-metric">
+                            <div class="metric-value">98.7%</div>
+                            <div class="metric-label">Accuracy</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div class="agent-info">
+                            <div class="agent-avatar avatar-market">MM</div>
+                            <div class="agent-details">
+                                <h4>Market Maker #17</h4>
+                                <p>Contract Pricing</p>
+                            </div>
+                        </div>
+                        <div class="performance-metric">
+                            <div class="metric-value">99.1%</div>
+                            <div class="metric-label">Efficiency</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div class="agent-info">
+                            <div class="agent-avatar avatar-hedge">HS</div>
+                            <div class="agent-details">
+                                <h4>Hedging Strategy #08</h4>
+                                <p>Risk Mitigation</p>
+                            </div>
+                        </div>
+                        <div class="performance-metric">
+                            <div class="metric-value">97.4%</div>
+                            <div class="metric-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="performance-card">
+                <div class="performance-header">
+                    <div class="performance-title">Market Performance</div>
+                    <div class="chart-actions">
+                        <button class="chart-btn active">Weekly</button>
+                        <button class="chart-btn">Monthly</button>
+                    </div>
+                </div>
+                <div class="performance-list">
+                    <div class="performance-item">
+                        <div class="agent-info">
+                            <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-cyan), #00b894);">
+                                <i class="fas fa-cloud-showers-heavy"></i>
+                            </div>
+                            <div class="agent-details">
+                                <h4>Weather Risk</h4>
+                                <p>Volume: $4.2M</p>
+                            </div>
+                        </div>
+                        <div class="performance-metric">
+                            <div class="metric-value change-positive">+2.4%</div>
+                            <div class="metric-label">Change</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div class="agent-info">
+                            <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-purple), #6c5ce7);">
+                                <i class="fas fa-anchor"></i>
+                            </div>
+                            <div class="agent-details">
+                                <h4>Port Delays</h4>
+                                <p>Volume: $2.8M</p>
+                            </div>
+                        </div>
+                        <div class="performance-metric">
+                            <div class="metric-value change-negative">-1.2%</div>
+                            <div class="metric-label">Change</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div class="agent-info">
+                            <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-pink), #fd79a8);">
+                                <i class="fas fa-gas-pump"></i>
+                            </div>
+                            <div class="agent-details">
+                                <h4>Fuel Prices</h4>
+                                <p>Volume: $3.5M</p>
+                            </div>
+                        </div>
+                        <div class="performance-metric">
+                            <div class="metric-value change-positive">+3.7%</div>
+                            <div class="metric-label">Change</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Distribution -->
+        <div class="risk-distribution">
+            <div class="distribution-card">
+                <div class="distribution-header">
+                    <div class="distribution-title">Risk Exposure by Type</div>
+                </div>
+                <div class="distribution-chart">
+                    <canvas id="exposureChart"></canvas>
+                </div>
+            </div>
+
+            <div class="distribution-card">
+                <div class="distribution-header">
+                    <div class="distribution-title">Geographic Risk Heatmap</div>
+                </div>
+                <div class="distribution-chart">
+                    <canvas id="heatmapChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="system-health">
+            <div class="health-card">
+                <div class="health-icon health-1">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="health-value">247 ms</div>
+                <div class="health-label">Avg. Response Time</div>
+            </div>
+
+            <div class="health-card">
+                <div class="health-icon health-2">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+                <div class="health-value">99.4%</div>
+                <div class="health-label">Network Uptime</div>
+            </div>
+
+            <div class="health-card">
+                <div class="health-icon health-3">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="health-value">100%</div>
+                <div class="health-label">Security Status</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Initialize Charts
+        function initializeCharts() {
+            // Volume Trend Chart
+            const volumeCtx = document.getElementById('volumeChart').getContext('2d');
+            new Chart(volumeCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Market Volume',
+                        data: [12.5, 13.2, 14.8, 15.3, 16.1, 16.8, 17.2, 17.5, 17.8, 18.1, 18.3, 18.4],
+                        borderColor: '#00f5d4',
+                        backgroundColor: 'rgba(0, 245, 212, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(value) {
+                                    return '$' + value + 'M';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Risk Distribution Chart
+            const riskCtx = document.getElementById('riskChart').getContext('2d');
+            new Chart(riskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Weather', 'Port Delays', 'Fuel Prices', 'Piracy', 'Cargo Damage', 'Route Efficiency'],
+                    datasets: [{
+                        data: [25, 18, 22, 8, 12, 15],
+                        backgroundColor: [
+                            '#00f5d4',
+                            '#7b61ff',
+                            '#ec4899',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#10b981'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#94a3b8',
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Risk Exposure Chart
+            const exposureCtx = document.getElementById('exposureChart').getContext('2d');
+            new Chart(exposureCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Low', 'Medium', 'High', 'Critical'],
+                    datasets: [{
+                        label: 'Risk Exposure',
+                        data: [45, 30, 15, 10],
+                        backgroundColor: [
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#7b61ff'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Heatmap Chart
+            const heatmapCtx = document.getElementById('heatmapChart').getContext('2d');
+            new Chart(heatmapCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Asia', 'Europe', 'North America', 'South America', 'Africa', 'Oceania'],
+                    datasets: [{
+                        label: 'Risk Level',
+                        data: [65, 45, 35, 55, 75, 40],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f59e0b',
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#10b981'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart button functionality
+        function setupChartButtons() {
+            const chartButtons = document.querySelectorAll('.chart-btn');
+            
+            chartButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons in the same group
+                    const parent = this.parentElement;
+                    const siblings = parent.querySelectorAll('.chart-btn');
+                    siblings.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                });
+            });
+        }
+
+        // Simulate real-time updates
+        function simulateRealTimeUpdates() {
+            setInterval(() => {
+                // Update KPI values with small random fluctuations
+                const kpiValues = document.querySelectorAll('.kpi-value');
+                const kpiChanges = document.querySelectorAll('.kpi-change');
+                
+                kpiValues.forEach((value, index) => {
+                    if (index === 0) { // Total Volume
+                        const currentValue = parseFloat(value.textContent.replace('$', '').replace('M', ''));
+                        const change = (Math.random() * 0.4 - 0.2);
+                        const newValue = currentValue * (1 + change/100);
+                        value.textContent = '$' + newValue.toFixed(1) + 'M';
+                        
+                        // Update change indicator
+                        const changeElement = kpiChanges[index];
+                        changeElement.innerHTML = `<i class="fas fa-arrow-${change >= 0 ? 'up' : 'down'}"></i><span>${change >= 0 ? '+' : ''}${change.toFixed(1)}%</span>`;
+                        changeElement.className = `kpi-change ${change >= 0 ? 'change-positive' : 'change-negative'}`;
+                    }
+                    else if (index === 1) { // Active Contracts
+                        const currentValue = parseInt(value.textContent.replace(',', ''));
+                        const change = Math.floor(Math.random() * 5) - 2;
+                        const newValue = currentValue + change;
+                        value.textContent = newValue.toLocaleString();
+                        
+                        // Update change indicator
+                        const changeElement = kpiChanges[index];
+                        const percentChange = (change / currentValue * 100).toFixed(1);
+                        changeElement.innerHTML = `<i class="fas fa-arrow-${change >= 0 ? 'up' : 'down'}"></i><span>${change >= 0 ? '+' : ''}${percentChange}%</span>`;
+                        changeElement.className = `kpi-change ${change >= 0 ? 'change-positive' : 'change-negative'}`;
+                    }
+                });
+            }, 5000);
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            setupChartButtons();
+            simulateRealTimeUpdates();
+        });
+    </script>
+</body>
+</html>

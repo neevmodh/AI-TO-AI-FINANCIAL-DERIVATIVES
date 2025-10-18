@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation | Project Ares</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0e17;
+            --secondary-bg: #131a2a;
+            --card-bg: #1e293b;
+            --accent-cyan: #00f5d4;
+            --accent-purple: #7b61ff;
+            --accent-pink: #ec4899;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border-radius: 16px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Enhanced Background Effects */
+        .background-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .grid-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 245, 212, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 212, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 25s linear infinite;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-cyan);
+            top: -100px;
+            left: -100px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-purple);
+            bottom: -50px;
+            right: -50px;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        /* Enhanced Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 3rem;
+            background: rgba(10, 14, 23, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            color: var(--accent-cyan);
+            font-size: 2rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--text-primary);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 2px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--glass);
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--glass-border);
+        }
+
+        .pulse {
+            width: 12px;
+            height: 12px;
+            background: var(--success);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .pulse::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        /* Documentation Layout */
+        .docs-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem;
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
+            gap: 2.5rem;
+            min-height: calc(100vh - 100px);
+        }
+
+        /* Sidebar Navigation */
+        .docs-sidebar {
+            position: sticky;
+            top: 120px;
+            height: fit-content;
+            background: var(--glass);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .docs-nav {
+            list-style: none;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-left: 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.8rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--glass-border);
+        }
+
+        .nav-link.active {
+            color: var(--accent-cyan);
+            background: rgba(0, 245, 212, 0.1);
+            border-color: rgba(0, 245, 212, 0.2);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* Main Content */
+        .docs-main {
+            background: var(--glass);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--glass-border);
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .docs-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .docs-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .docs-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        .docs-section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 120px;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .section-title-main {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(0, 245, 212, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-cyan);
+            font-size: 1.2rem;
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .content-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .content-card {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+        }
+
+        .content-card:hover {
+            border-color: rgba(0, 245, 212, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .card-content {
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border: 1px solid #1e293b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .code-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .copy-btn {
+            background: rgba(0, 245, 212, 0.1);
+            border: 1px solid rgba(0, 245, 212, 0.2);
+            color: var(--accent-cyan);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0, 245, 212, 0.2);
+        }
+
+        .code-content {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .code-keyword {
+            color: #7b61ff;
+        }
+
+        .code-string {
+            color: #10b981;
+        }
+
+        .code-comment {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .code-number {
+            color: #f59e0b;
+        }
+
+        /* Right Sidebar - Quick Links */
+        .quick-links {
+            position: sticky;
+            top: 120px;
+            height: fit-content;
+        }
+
+        .links-card {
+            background: var(--glass);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .links-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .quick-links-list {
+            list-style: none;
+        }
+
+        .quick-link {
+            margin-bottom: 0.8rem;
+        }
+
+        .quick-link a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            display: block;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .quick-link a:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--glass-border);
+        }
+
+        /* API Reference */
+        .api-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .api-table th {
+            background: rgba(0, 245, 212, 0.1);
+            color: var(--accent-cyan);
+            font-weight: 600;
+            padding: 1.2rem;
+            text-align: left;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .api-table td {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .api-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .api-method {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .method-get {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .method-post {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .method-put {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .method-delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
+            }
+            
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(60px, 60px);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate(30px, 30px) rotate(120deg);
+            }
+            66% {
+                transform: translate(-20px, 20px) rotate(240deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .docs-container {
+                grid-template-columns: 250px 1fr;
+            }
+            
+            .quick-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .docs-container {
+                grid-template-columns: 1fr;
+                padding: 1.5rem;
+                gap: 1.5rem;
+            }
+            
+            .docs-sidebar {
+                position: static;
+            }
+            
+            .docs-main {
+                padding: 2rem;
+            }
+            
+            header {
+                padding: 1rem 1.5rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                gap: 1.5rem;
+            }
+            
+            .status-indicator {
+                align-self: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .docs-title {
+                font-size: 2rem;
+            }
+            
+            .docs-main {
+                padding: 1.5rem;
+            }
+            
+            .section-title-main {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="background-effects">
+        <div class="grid-pattern"></div>
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-robot logo-icon"></i>
+            <span>ARES</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="Live.html">Live Markets</a></li>
+                <li><a href="agents.html">Agent Network</a></li>
+                <li><a href="Analytic.html">Analytics</a></li>
+                <li><a href="docs.html" class="active">Documentation</a></li>
+            </ul>
+        </nav>
+        <div class="status-indicator">
+            <div class="pulse"></div>
+            <span>System Online</span>
+        </div>
+    </header>
+
+    <!-- Documentation Layout -->
+    <div class="docs-container">
+        <!-- Left Sidebar -->
+        <aside class="docs-sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">
+                    <i class="fas fa-book"></i>
+                    Documentation
+                </h2>
+            </div>
+            <nav class="docs-nav">
+                <div class="nav-section">
+                    <h3 class="section-title">Getting Started</h3>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="#introduction" class="nav-link active">
+                                <span class="nav-icon"><i class="fas fa-play-circle"></i></span>
+                                Introduction
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#quick-start" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-rocket"></i></span>
+                                Quick Start
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#installation" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-download"></i></span>
+                                Installation
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="section-title">Core Concepts</h3>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="#architecture" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-sitemap"></i></span>
+                                System Architecture
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#agents" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-robot"></i></span>
+                                Agent Ecosystem
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#markets" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                                Market Mechanics
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="section-title">API Reference</h3>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="#rest-api" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-code"></i></span>
+                                REST API
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#websockets" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-bolt"></i></span>
+                                WebSocket API
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#authentication" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-key"></i></span>
+                                Authentication
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="section-title">Advanced</h3>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="#deployment" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-server"></i></span>
+                                Deployment
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#security" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-shield-alt"></i></span>
+                                Security
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#troubleshooting" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-tools"></i></span>
+                                Troubleshooting
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="docs-main">
+            <div class="docs-header">
+                <h1 class="docs-title">Project Ares Documentation</h1>
+                <p class="docs-subtitle">Complete guide to the AI-to-AI financial derivatives platform. Learn how to deploy, configure, and extend the autonomous agent ecosystem.</p>
+            </div>
+
+            <!-- Introduction Section -->
+            <section id="introduction" class="docs-section">
+                <div class="section-header">
+                    <h2 class="section-title-main">
+                        <div class="section-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        Introduction to Project Ares
+                    </h2>
+                    <p class="section-description">
+                        Project Ares is a revolutionary AI-to-AI financial derivatives platform that enables autonomous agents to trade micro-risk derivatives in real-time.
+                    </p>
+                </div>
+
+                <div class="content-grid">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3 class="card-title">What is Project Ares?</h3>
+                            <p class="card-subtitle">Understanding the core concept</p>
+                        </div>
+                        <div class="card-content">
+                            <p>Project Ares creates a decentralized marketplace where AI agents can hedge against specific risks associated with global shipping routes. By breaking down complex shipping risks into tradeable derivatives, we enable precise risk management at a granular level.</p>
+                            
+                            <p>The platform operates on the principle of creating a liquid market for micro-risks that are traditionally difficult to hedge. Autonomous agents continuously monitor global conditions, identify risks, create derivative contracts, and execute trades without human intervention.</p>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Key Features</h3>
+                            <p class="card-subtitle">What makes Ares unique</p>
+                        </div>
+                        <div class="card-content">
+                            <ul style="list-style: none; line-height: 2;">
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i> Autonomous AI agent ecosystem</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i> Real-time risk assessment and pricing</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i> Micro-risk derivative contracts</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i> Global shipping route monitoring</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i> Automated settlement and payouts</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i> High-frequency trading capabilities</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Architecture Section -->
+            <section id="architecture" class="docs-section">
+                <div class="section-header">
+                    <h2 class="section-title-main">
+                        <div class="section-icon">
+                            <i class="fas fa-sitemap"></i>
+                        </div>
+                        System Architecture
+                    </h2>
+                    <p class="section-description">
+                        Understanding the technical foundation of the Project Ares platform.
+                    </p>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Architecture Overview</h3>
+                        <p class="card-subtitle">High-level system design</p>
+                    </div>
+                    <div class="card-content">
+                        <p>The Project Ares platform is built on a microservices architecture with the following core components:</p>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">System Architecture</div>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <i class="fas fa-copy"></i>
+                                    Copy
+                                </button>
+                            </div>
+                            <div class="code-content">
+                                <span class="code-keyword">Core Components:</span><br>
+                                - Risk Assessment Engine<br>
+                                - Market Making Service<br>
+                                - Agent Orchestrator<br>
+                                - Settlement Oracle<br>
+                                - Data Streaming Pipeline<br><br>
+
+                                <span class="code-keyword">Data Sources:</span><br>
+                                - Weather APIs<br>
+                                - Port Congestion Data<br>
+                                - Shipping Route Information<br>
+                                - Geopolitical Events<br><br>
+
+                                <span class="code-keyword">Infrastructure:</span><br>
+                                - Kubernetes Cluster<br>
+                                - Redis for Caching<br>
+                                - PostgreSQL Database<br>
+                                - Apache Kafka for Events
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- API Reference Section -->
+            <section id="rest-api" class="docs-section">
+                <div class="section-header">
+                    <h2 class="section-title-main">
+                        <div class="section-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        REST API Reference
+                    </h2>
+                    <p class="section-description">
+                        Complete reference for the Project Ares REST API endpoints.
+                    </p>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">API Endpoints</h3>
+                        <p class="card-subtitle">Available REST endpoints</p>
+                    </div>
+                    <div class="card-content">
+                        <table class="api-table">
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Endpoint</th>
+                                    <th>Description</th>
+                                    <th>Authentication</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="api-method method-get">GET</span></td>
+                                    <td>/api/v1/markets</td>
+                                    <td>List all active markets</td>
+                                    <td>Optional</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="api-method method-get">GET</span></td>
+                                    <td>/api/v1/contracts</td>
+                                    <td>Get active contracts</td>
+                                    <td>Required</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="api-method method-post">POST</span></td>
+                                    <td>/api/v1/contracts</td>
+                                    <td>Create new contract</td>
+                                    <td>Required</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="api-method method-get">GET</span></td>
+                                    <td>/api/v1/agents</td>
+                                    <td>List all agents</td>
+                                    <td>Required</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="api-method method-put">PUT</span></td>
+                                    <td>/api/v1/agents/{id}</td>
+                                    <td>Update agent configuration</td>
+                                    <td>Required</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Example Usage</h3>
+                        <p class="card-subtitle">JavaScript implementation example</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript Example</div>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <i class="fas fa-copy"></i>
+                                    Copy
+                                </button>
+                            </div>
+                            <div class="code-content">
+                                <span class="code-keyword">const</span> <span class="code-variable">axios</span> = <span class="code-keyword">require</span>(<span class="code-string">'axios'</span>);<br><br>
+
+                                <span class="code-comment">// Initialize Ares client</span><br>
+                                <span class="code-keyword">const</span> <span class="code-variable">aresClient</span> = axios.create({<br>
+                                &nbsp;&nbsp;<span class="code-variable">baseURL</span>: <span class="code-string">'https://api.ares-finance.com/api/v1'</span>,<br>
+                                &nbsp;&nbsp;<span class="code-variable">headers</span>: {<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-variable">Authorization</span>: <span class="code-string">`Bearer ${process.env.ARES_API_KEY}`</span><br>
+                                &nbsp;&nbsp;}<br>
+                                });<br><br>
+
+                                <span class="code-comment">// Fetch active markets</span><br>
+                                <span class="code-keyword">async function</span> <span class="code-function">getMarkets</span>() {<br>
+                                &nbsp;&nbsp;<span class="code-keyword">try</span> {<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">const</span> <span class="code-variable">response</span> = <span class="code-keyword">await</span> <span class="code-variable">aresClient</span>.<span class="code-function">get</span>(<span class="code-string">'/markets'</span>);<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-variable">response</span>.<span class="code-variable">data</span>;<br>
+                                &nbsp;&nbsp;} <span class="code-keyword">catch</span> (<span class="code-variable">error</span>) {<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-variable">console</span>.<span class="code-function">error</span>(<span class="code-string">'Failed to fetch markets:'</span>, <span class="code-variable">error</span>);<br>
+                                &nbsp;&nbsp;}<br>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Agent Configuration Section -->
+            <section id="agents" class="docs-section">
+                <div class="section-header">
+                    <h2 class="section-title-main">
+                        <div class="section-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        Agent Configuration
+                    </h2>
+                    <p class="section-description">
+                        Configuring and managing autonomous AI agents.
+                    </p>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Agent Types</h3>
+                        <p class="card-subtitle">Available agent specializations</p>
+                    </div>
+                    <div class="card-content">
+                        <p>Project Ares features several specialized agent types, each with specific roles in the ecosystem:</p>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">Agent Configuration</div>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <i class="fas fa-copy"></i>
+                                    Copy
+                                </button>
+                            </div>
+                            <div class="code-content">
+                                {<br>
+                                &nbsp;&nbsp;<span class="code-string">"agent_type"</span>: <span class="code-string">"risk_sensor"</span>,<br>
+                                &nbsp;&nbsp;<span class="code-string">"configuration"</span>: {<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"data_sources"</span>: [<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"weather_api"</span>,<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"port_congestion"</span>,<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"political_risk"</span><br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;],<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"update_frequency"</span>: <span class="code-string">"5m"</span>,<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"confidence_threshold"</span>: <span class="code-number">0.7</span>,<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"risk_categories"</span>: [<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"weather"</span>,<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"port_delays"</span>,<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"fuel_prices"</span><br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;]<br>
+                                &nbsp;&nbsp;}<br>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Right Sidebar - Quick Links -->
+        <aside class="quick-links">
+            <div class="links-card">
+                <h3 class="links-title">
+                    <i class="fas fa-link"></i>
+                    Quick Links
+                </h3>
+                <ul class="quick-links-list">
+                    <li class="quick-link"><a href="#introduction">Getting Started Guide</a></li>
+                    <li class="quick-link"><a href="#api-reference">API Reference</a></li>
+                    <li class="quick-link"><a href="#agent-config">Agent Configuration</a></li>
+                    <li class="quick-link"><a href="#deployment">Deployment Guide</a></li>
+                    <li class="quick-link"><a href="#troubleshooting">Troubleshooting</a></li>
+                </ul>
+            </div>
+
+            <div class="links-card">
+                <h3 class="links-title">
+                    <i class="fas fa-download"></i>
+                    Resources
+                </h3>
+                <ul class="quick-links-list">
+                    <li class="quick-link"><a href="#"><i class="fas fa-file-pdf"></i> Technical Whitepaper</a></li>
+                    <li class="quick-link"><a href="#"><i class="fas fa-code"></i> SDK Downloads</a></li>
+                    <li class="quick-link"><a href="#"><i class="fas fa-video"></i> Video Tutorials</a></li>
+                    <li class="quick-link"><a href="#"><i class="fas fa-users"></i> Community Forum</a></li>
+                </ul>
+            </div>
+
+            <div class="links-card">
+                <h3 class="links-title">
+                    <i class="fas fa-life-ring"></i>
+                    Support
+                </h3>
+                <ul class="quick-links-list">
+                    <li class="quick-link"><a href="#"><i class="fas fa-envelope"></i> Contact Support</a></li>
+                    <li class="quick-link"><a href="#"><i class="fas fa-bug"></i> Report Issues</a></li>
+                    <li class="quick-link"><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('.nav-link, .quick-link a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active nav link
+                    document.querySelectorAll('.nav-link').forEach(navLink => {
+                        navLink.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const codeContent = codeBlock.querySelector('.code-content');
+            const textToCopy = codeContent.textContent;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                button.style.background = 'rgba(16, 185, 129, 0.2)';
+                button.style.color = 'var(--success)';
+                button.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '';
+                    button.style.color = '';
+                    button.style.borderColor = '';
+                }, 2000);
+            });
+        }
+
+        // Update active nav based on scroll position
+        function updateActiveNav() {
+            const sections = document.querySelectorAll('.docs-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 150;
+                if (window.scrollY >= sectionTop) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            window.addEventListener('scroll', updateActiveNav);
+            updateActiveNav(); // Set initial active state
+        });
+
+        // Search functionality (placeholder)
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                alert('Search functionality would open here. Press Ctrl+K to search documentation.');
+            }
+        });
+    </script>
+</body>
+</html>

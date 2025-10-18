@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Ares | AI-to-AI Financial Derivatives</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0e17;
+            --secondary-bg: #131a2a;
+            --card-bg: #1e293b;
+            --accent-cyan: #00f5d4;
+            --accent-purple: #7b61ff;
+            --accent-pink: #ec4899;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border-radius: 16px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Enhanced Background Effects */
+        .background-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .grid-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 245, 212, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 212, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 25s linear infinite;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-cyan);
+            top: -150px;
+            left: -150px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-purple);
+            bottom: -100px;
+            right: -100px;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-pink);
+            top: 50%;
+            left: 70%;
+            animation: float 18s ease-in-out infinite;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        /* Enhanced Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 3rem;
+            background: rgba(10, 14, 23, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            color: var(--accent-cyan);
+            font-size: 2rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--text-primary);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 2px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--glass);
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+        }
+
+        .status-indicator:hover {
+            background: rgba(0, 245, 212, 0.1);
+            border-color: rgba(0, 245, 212, 0.3);
+        }
+
+        .pulse {
+            width: 12px;
+            height: 12px;
+            background: var(--success);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .pulse::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        /* Enhanced Hero Section */
+        .hero {
+            padding: 4rem 3rem 3rem;
+            text-align: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+            animation: textGlow 3s ease-in-out infinite alternate;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: var(--primary-bg);
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 245, 212, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .metrics-ticker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: var(--glass);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+        }
+
+        .metric:hover {
+            transform: translateY(-10px);
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(0, 245, 212, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        /* Enhanced Dashboard Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1.2fr 2fr 1fr;
+            gap: 2rem;
+            padding: 0 3rem 4rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background: var(--glass);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0,245,212,0.02), rgba(123,97,255,0.02));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .panel:hover::before {
+            opacity: 1;
+        }
+
+        .panel:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 245, 212, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .panel-title i {
+            color: var(--accent-cyan);
+            font-size: 1.5rem;
+        }
+
+        .panel-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .panel-btn {
+            padding: 0.5rem 1rem;
+            background: var(--secondary-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .panel-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--primary-bg);
+            border-color: var(--accent-cyan);
+        }
+
+        /* Enhanced Risk Map */
+        .risk-map {
+            height: 450px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            background: var(--secondary-bg);
+        }
+
+        .map-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            position: relative;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+        }
+
+        .map-point {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .map-point:hover {
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+
+        .risk-low {
+            background: var(--success);
+            box-shadow: 0 0 20px var(--success);
+        }
+
+        .risk-medium {
+            background: var(--warning);
+            box-shadow: 0 0 20px var(--warning);
+        }
+
+        .risk-high {
+            background: var(--error);
+            box-shadow: 0 0 20px var(--error);
+            animation: pulse 1.5s infinite;
+        }
+
+        .ship {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            color: var(--accent-cyan);
+            animation: moveShip 25s linear infinite;
+            filter: drop-shadow(0 0 8px var(--accent-cyan));
+        }
+
+        /* Enhanced Activity Feed */
+        .activity-feed {
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .activity-feed::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .activity-feed::-webkit-scrollbar-track {
+            background: var(--secondary-bg);
+            border-radius: 10px;
+        }
+
+        .activity-feed::-webkit-scrollbar-thumb {
+            background: var(--accent-cyan);
+            border-radius: 10px;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 1.2rem;
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-left: 4px solid var(--accent-cyan);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,245,212,0.1), transparent);
+            transition: 0.5s;
+        }
+
+        .activity-item:hover::before {
+            left: 100%;
+        }
+
+        .activity-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            transform: translateX(5px);
+        }
+
+        .activity-item.detection {
+            border-left-color: var(--accent-cyan);
+        }
+
+        .activity-item.trading {
+            border-left-color: var(--accent-purple);
+        }
+
+        .activity-item.settlement {
+            border-left-color: var(--success);
+        }
+
+        .agent-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .avatar-risk {
+            background: linear-gradient(135deg, var(--accent-cyan), #00b894);
+        }
+
+        .avatar-market {
+            background: linear-gradient(135deg, var(--accent-purple), #6c5ce7);
+        }
+
+        .avatar-hedge {
+            background: linear-gradient(135deg, var(--accent-pink), #fd79a8);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-message {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* Enhanced Market Data */
+        .contract-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .contract-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .contract-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(0, 245, 212, 0.2);
+            transform: translateX(5px);
+        }
+
+        .contract-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        .contract-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .contract-price {
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .price-up {
+            color: var(--success);
+        }
+
+        .price-down {
+            color: var(--error);
+        }
+
+        /* Enhanced Analytics */
+        .analytics {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .analytics-card {
+            background: var(--glass);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analytics-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+        }
+
+        .analytics-card:hover {
+            transform: translateY(-8px);
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(0, 245, 212, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .analytics-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon-1 {
+            background: linear-gradient(135deg, var(--accent-cyan), #00b894);
+            color: white;
+        }
+
+        .icon-2 {
+            background: linear-gradient(135deg, var(--accent-purple), #6c5ce7);
+            color: white;
+        }
+
+        .icon-3 {
+            background: linear-gradient(135deg, var(--accent-pink), #fd79a8);
+            color: white;
+        }
+
+        .icon-4 {
+            background: linear-gradient(135deg, var(--success), #27ae60);
+            color: white;
+        }
+
+        .analytics-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .analytics-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Enhanced Animations */
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
+            }
+            
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(60px, 60px);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate(30px, 30px) rotate(120deg);
+            }
+            66% {
+                transform: translate(-20px, 20px) rotate(240deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        @keyframes moveShip {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(200px, 100px) rotate(90deg);
+            }
+            50% {
+                transform: translate(400px, 50px) rotate(180deg);
+            }
+            75% {
+                transform: translate(200px, 150px) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        @keyframes textGlow {
+            0% {
+                text-shadow: 0 0 20px rgba(0, 245, 212, 0.5);
+            }
+            100% {
+                text-shadow: 0 0 30px rgba(123, 97, 255, 0.5), 0 0 40px rgba(236, 72, 153, 0.3);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scaleX(0);
+            }
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .analytics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .metrics-ticker {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+            
+            .metric-value {
+                font-size: 2rem;
+            }
+            
+            nav ul {
+                gap: 1.5rem;
+            }
+            
+            .analytics {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 1rem 1.5rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .status-indicator {
+                align-self: flex-start;
+            }
+
+            .dashboard {
+                padding: 0 1.5rem 3rem;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .metrics-ticker {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero {
+                padding: 3rem 1.5rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced Background Effects -->
+    <div class="background-effects">
+        <div class="grid-pattern"></div>
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+        <div class="particles" id="particles-container"></div>
+    </div>
+
+    <!-- Enhanced Header -->
+    <header>
+        <div class="logo" onclick="showPage('dashboard')">
+            <i class="fas fa-robot logo-icon"></i>
+            <span>ARES</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Dashboard</a></li>
+                <li><a href="Live.html">Live Markets</a></li>
+                <li><a href="agents.html">Agent Network</a></li>
+                <li><a href="Analytic.html">Analytics</a></li>
+                <li><a href="doc.html">Documentation</a></li>
+            </ul>
+        </nav>
+        <div class="status-indicator">
+            <div class="pulse"></div>
+            <span>System Online</span>
+        </div>
+    </header>
+
+    <!-- Enhanced Hero Section -->
+    <section class="hero">
+        <h1>AI-TO-AI FINANCIAL DERIVATIVES</h1>
+        <p>Autonomous AI agents trading micro-risk derivatives in real-time across global shipping routes. Advanced machine learning algorithms power the future of risk management.</p>
+        
+        <div class="btn-group">
+            <a href="Live.html" class="btn">
+                <i class="fas fa-chart-line"></i>
+                Explore Live Markets
+            </a>
+            <a href="doc.html" class="btn btn-outline">
+                <i class="fas fa-book"></i>
+                Read Documentation
+            </a>
+        </div>
+        
+        <div class="metrics-ticker">
+            <div class="metric">
+                <div class="metric-value">
+                    <i class="fas fa-file-contract"></i>
+                    1,247
+                </div>
+                <div class="metric-label">Active Contracts</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">
+                    <i class="fas fa-chart-bar"></i>
+                    $4.8M
+                </div>
+                <div class="metric-label">Total Volume</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">
+                    <i class="fas fa-robot"></i>
+                    89
+                </div>
+                <div class="metric-label">Active Agents</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">
+                    <i class="fas fa-handshake"></i>
+                    99.7%
+                </div>
+                <div class="metric-label">Settlement Rate</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Dashboard Grid -->
+    <section class="dashboard">
+        <!-- Left Panel - Risk Map -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2 class="panel-title"><i class="fas fa-globe-americas"></i> Risk Visualization Map</h2>
+                <div class="panel-actions">
+                    <button class="panel-btn">Refresh</button>
+                    <button class="panel-btn">Filters</button>
+                </div>
+            </div>
+            <div class="risk-map">
+                <div class="map-container">
+                    <!-- Dynamic risk points -->
+                    <div class="map-point risk-low" style="top: 30%; left: 40%;" data-risk="Low risk - Normal conditions"></div>
+                    <div class="map-point risk-medium" style="top: 50%; left: 60%;" data-risk="Medium risk - Weather patterns"></div>
+                    <div class="map-point risk-high" style="top: 70%; left: 30%;" data-risk="High risk - Port congestion"></div>
+                    <div class="map-point risk-low" style="top: 20%; left: 70%;" data-risk="Low risk - Clear route"></div>
+                    <div class="map-point risk-high" style="top: 60%; left: 20%;" data-risk="High risk - Political unrest"></div>
+                    
+                    <!-- Animated ships -->
+                    <div class="ship" style="top: 40%; left: 20%;">
+                        <i class="fas fa-ship"></i>
+                    </div>
+                    <div class="ship" style="top: 60%; left: 70%;">
+                        <i class="fas fa-ship"></i>
+                    </div>
+                    <div class="ship" style="top: 25%; left: 50%;">
+                        <i class="fas fa-ship"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel - Agent Activity -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2 class="panel-title"><i class="fas fa-stream"></i> Live Agent Activity</h2>
+                <div class="panel-actions">
+                    <button class="panel-btn">Pause</button>
+                    <button class="panel-btn">Export</button>
+                </div>
+            </div>
+            <div class="activity-feed">
+                <div class="activity-item detection">
+                    <div class="agent-avatar avatar-risk">RS</div>
+                    <div class="activity-content">
+                        <div class="activity-message">Risk Sensor #42 detected weather anomaly in South China Sea. Probability: 68%</div>
+                        <div class="activity-time">2 minutes ago</div>
+                    </div>
+                </div>
+                <div class="activity-item trading">
+                    <div class="agent-avatar avatar-market">MM</div>
+                    <div class="activity-content">
+                        <div class="activity-message">Market Maker #17 created derivative contract for Route A12. Premium: $4,200</div>
+                        <div class="activity-time">5 minutes ago</div>
+                    </div>
+                </div>
+                <div class="activity-item settlement">
+                    <div class="agent-avatar avatar-hedge">HS</div>
+                    <div class="activity-content">
+                        <div class="activity-message">Hedging Strategy #08 purchased contract C-8842. Notional: $125,000</div>
+                        <div class="activity-time">12 minutes ago</div>
+                    </div>
+                </div>
+                <div class="activity-item detection">
+                    <div class="agent-avatar avatar-risk">RS</div>
+                    <div class="activity-content">
+                        <div class="activity-message">Risk Sensor #29 identified port congestion in Rotterdam. Impact: Medium</div>
+                        <div class="activity-time">18 minutes ago</div>
+                    </div>
+                </div>
+                <div class="activity-item settlement">
+                    <div class="agent-avatar avatar-hedge">HS</div>
+                    <div class="activity-content">
+                        <div class="activity-message">Contract C-7719 settled successfully. Payout: $8,450 to Hedger #33</div>
+                        <div class="activity-time">25 minutes ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Market Data -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2 class="panel-title"><i class="fas fa-chart-line"></i> Active Contracts</h2>
+                <div class="panel-actions">
+                    <button class="panel-btn">Sort</button>
+                    <button class="panel-btn">View All</button>
+                </div>
+            </div>
+            <div class="contract-list">
+                <div class="contract-item">
+                    <div class="contract-info">
+                        <h4>Route A12 - Weather Risk</h4>
+                        <p>Singapore to Rotterdam • Expires in 3d</p>
+                    </div>
+                    <div class="contract-price price-up">
+                        <i class="fas fa-arrow-up"></i>
+                        $4,200
+                    </div>
+                </div>
+                <div class="contract-item">
+                    <div class="contract-info">
+                        <h4>Route B07 - Port Delay</h4>
+                        <p>Shanghai to Los Angeles • Expires in 1d</p>
+                    </div>
+                    <div class="contract-price price-down">
+                        <i class="fas fa-arrow-down"></i>
+                        $2,850
+                    </div>
+                </div>
+                <div class="contract-item">
+                    <div class="contract-info">
+                        <h4>Route C33 - Fuel Price</h4>
+                        <p>Hong Kong to Hamburg • Expires in 5d</p>
+                    </div>
+                    <div class="contract-price price-up">
+                        <i class="fas fa-arrow-up"></i>
+                        $3,750
+                    </div>
+                </div>
+                <div class="contract-item">
+                    <div class="contract-info">
+                        <h4>Route D19 - Piracy Risk</h4>
+                        <p>Dubai to Lagos • Expires in 2d</p>
+                    </div>
+                    <div class="contract-price price-up">
+                        <i class="fas fa-arrow-up"></i>
+                        $5,100
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Analytics Section -->
+        <div class="analytics">
+            <div class="analytics-card">
+                <div class="analytics-icon icon-1">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="analytics-value">247 ms</div>
+                <div class="analytics-label">Avg. Response Time</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-icon icon-2">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <div class="analytics-value">98.3%</div>
+                <div class="analytics-label">Contract Success Rate</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-icon icon-3">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="analytics-value">$2.4M</div>
+                <div class="analytics-label">Risk Mitigated</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-icon icon-4">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+                <div class="analytics-value">42</div>
+                <div class="analytics-label">Active Nodes</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Enhanced particle system
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 80;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random position
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                
+                // Random size and color
+                const size = Math.random() * 6 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                const colors = ['#00f5d4', '#7b61ff', '#ec4899', '#10b981'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.background = color;
+                
+                // Random animation
+                const duration = Math.random() * 25 + 15;
+                const delay = Math.random() * 5;
+                particle.style.animation = `float ${duration}s ${delay}s infinite linear`;
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Enhanced real-time updates
+        function simulateUpdates() {
+            // Update metrics with realistic fluctuations
+            setInterval(() => {
+                const contracts = document.querySelector('.metric:nth-child(1) .metric-value');
+                const volume = document.querySelector('.metric:nth-child(2) .metric-value');
+                const agents = document.querySelector('.metric:nth-child(3) .metric-value');
+                const settlement = document.querySelector('.metric:nth-child(4) .metric-value');
+                
+                if (contracts && volume && agents && settlement) {
+                    // Contracts: small random changes
+                    const contractChange = Math.floor(Math.random() * 5) - 2;
+                    const currentContracts = parseInt(contracts.textContent.replace(',', ''));
+                    contracts.innerHTML = `<i class="fas fa-file-contract"></i>${(currentContracts + contractChange).toLocaleString()}`;
+                    
+                    // Volume: realistic financial fluctuations
+                    const volumeChange = (Math.random() * 0.3 - 0.15);
+                    const currentVolume = parseFloat(volume.textContent.replace('$', '').replace('M', ''));
+                    const newVolume = currentVolume * (1 + volumeChange/100);
+                    volume.innerHTML = `<i class="fas fa-chart-bar"></i>$${newVolume.toFixed(1)}M`;
+                    
+                    // Agents: occasional changes
+                    if (Math.random() > 0.7) {
+                        const agentChange = Math.floor(Math.random() * 3) - 1;
+                        const currentAgents = parseInt(agents.textContent);
+                        agents.innerHTML = `<i class="fas fa-robot"></i>${currentAgents + agentChange}`;
+                    }
+                    
+                    // Settlement rate: very stable with tiny fluctuations
+                    const settlementChange = (Math.random() * 0.1 - 0.05);
+                    const currentSettlement = parseFloat(settlement.textContent.replace('%', ''));
+                    const newSettlement = Math.min(100, Math.max(99.5, currentSettlement + settlementChange));
+                    settlement.innerHTML = `<i class="fas fa-handshake"></i>${newSettlement.toFixed(1)}%`;
+                }
+            }, 3000);
+            
+            // Enhanced activity feed updates
+            setInterval(() => {
+                const activityFeed = document.querySelector('.activity-feed');
+                if (activityFeed && activityFeed.children.length > 0) {
+                    const activities = [
+                        {
+                            type: 'detection',
+                            avatar: 'RS',
+                            avatarClass: 'avatar-risk',
+                            message: 'Risk Sensor detected route deviation in Mediterranean. Impact: Low',
+                            time: 'Just now'
+                        },
+                        {
+                            type: 'trading',
+                            avatar: 'MM',
+                            avatarClass: 'avatar-market',
+                            message: 'New derivative contract created for Route E15. Premium: $3,250',
+                            time: 'Just now'
+                        },
+                        {
+                            type: 'settlement',
+                            avatar: 'HS',
+                            avatarClass: 'avatar-hedge',
+                            message: 'Contract C-9921 settled. Payout: $6,120 to Hedger #27',
+                            time: 'Just now'
+                        },
+                        {
+                            type: 'detection',
+                            avatar: 'RS',
+                            avatarClass: 'avatar-risk',
+                            message: 'Fuel price volatility detected in Atlantic routes. Impact: Medium',
+                            time: 'Just now'
+                        }
+                    ];
+                    
+                    const activity = activities[Math.floor(Math.random() * activities.length)];
+                    
+                    const newItem = document.createElement('div');
+                    newItem.classList.add('activity-item', activity.type);
+                    
+                    newItem.innerHTML = `
+                        <div class="agent-avatar ${activity.avatarClass}">${activity.avatar}</div>
+                        <div class="activity-content">
+                            <div class="activity-message">${activity.message}</div>
+                            <div class="activity-time">${activity.time}</div>
+                        </div>
+                    `;
+                    
+                    activityFeed.insertBefore(newItem, activityFeed.firstChild);
+                    
+                    // Remove oldest item if too many
+                    if (activityFeed.children.length > 6) {
+                        activityFeed.removeChild(activityFeed.lastChild);
+                    }
+                }
+            }, 8000);
+
+            // Update contract prices
+            setInterval(() => {
+                const contractItems = document.querySelectorAll('.contract-item');
+                contractItems.forEach(item => {
+                    if (Math.random() > 0.5) {
+                        const priceElement = item.querySelector('.contract-price');
+                        const currentPrice = parseFloat(priceElement.textContent.replace('$', '').replace(',', ''));
+                        const change = (Math.random() * 200 - 100);
+                        const newPrice = Math.max(1000, currentPrice + change);
+                        
+                        const isPositive = change >= 0;
+                        priceElement.className = `contract-price ${isPositive ? 'price-up' : 'price-down'}`;
+                        priceElement.innerHTML = `<i class="fas fa-arrow-${isPositive ? 'up' : 'down'}"></i>$${newPrice.toLocaleString()}`;
+                    }
+                });
+            }, 5000);
+        }
+
+        // Interactive risk map points
+        function setupRiskMapInteractions() {
+            const riskPoints = document.querySelectorAll('.map-point');
+            riskPoints.forEach(point => {
+                point.addEventListener('mouseenter', function() {
+                    const riskLevel = this.getAttribute('data-risk');
+                    // In a real application, you would show a tooltip with risk details
+                    console.log(`Risk: ${riskLevel}`);
+                });
+            });
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            simulateUpdates();
+            setupRiskMapInteractions();
+            
+            // Add loading animation
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // Enhanced navigation (for multi-page setup)
+        function navigateTo(page) {
+            // Smooth page transition
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                window.location.href = page;
+            }, 300);
+        }
+    </script>
+</body>
+</html>

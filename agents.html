@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Network | Project Ares</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0e17;
+            --secondary-bg: #131a2a;
+            --card-bg: #1e293b;
+            --accent-cyan: #00f5d4;
+            --accent-purple: #7b61ff;
+            --accent-pink: #ec4899;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background-color: rgba(10, 14, 23, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            color: var(--accent-cyan);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--text-primary);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-cyan);
+            border-radius: 2px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+        }
+
+        .pulse {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .pulse::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 3rem 2rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        /* Agent Network Container */
+        .agent-network {
+            padding: 0 2rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Network Overview */
+        .network-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .overview-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 245, 212, 0.2);
+        }
+
+        .overview-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .overview-1::before { background: linear-gradient(90deg, var(--accent-cyan), #00b894); }
+        .overview-2::before { background: linear-gradient(90deg, var(--accent-purple), #6c5ce7); }
+        .overview-3::before { background: linear-gradient(90deg, var(--accent-pink), #fd79a8); }
+        .overview-4::before { background: linear-gradient(90deg, var(--success), #27ae60); }
+
+        .overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .overview-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .icon-1 { background: rgba(0, 245, 212, 0.1); color: var(--accent-cyan); }
+        .icon-2 { background: rgba(123, 97, 255, 0.1); color: var(--accent-purple); }
+        .icon-3 { background: rgba(236, 72, 153, 0.1); color: var(--accent-pink); }
+        .icon-4 { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .overview-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .change-positive {
+            color: var(--success);
+        }
+
+        .change-negative {
+            color: var(--error);
+        }
+
+        /* Agent Types Grid */
+        .agent-types {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .filter-btn.active {
+            background: var(--accent-cyan);
+            color: var(--primary-bg);
+            border-color: var(--accent-cyan);
+        }
+
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .agent-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 245, 212, 0.2);
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .agent-risk::before { background: linear-gradient(90deg, var(--accent-cyan), #00b894); }
+        .agent-market::before { background: linear-gradient(90deg, var(--accent-purple), #6c5ce7); }
+        .agent-hedge::before { background: linear-gradient(90deg, var(--accent-pink), #fd79a8); }
+        .agent-settlement::before { background: linear-gradient(90deg, var(--warning), #f39c12); }
+        .agent-arbitrage::before { background: linear-gradient(90deg, #8b5cf6, #a855f7); }
+        .agent-liquidity::before { background: linear-gradient(90deg, #06b6d4, #0ea5e9); }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .agent-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .avatar-risk { background: linear-gradient(135deg, var(--accent-cyan), #00b894); }
+        .avatar-market { background: linear-gradient(135deg, var(--accent-purple), #6c5ce7); }
+        .avatar-hedge { background: linear-gradient(135deg, var(--accent-pink), #fd79a8); }
+        .avatar-settlement { background: linear-gradient(135deg, var(--warning), #f39c12); }
+        .avatar-arbitrage { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
+        .avatar-liquidity { background: linear-gradient(135deg, #06b6d4, #0ea5e9); }
+
+        .agent-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .agent-role {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .agent-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .status-online {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-offline {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .agent-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .agent-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .agent-stat {
+            text-align: center;
+            padding: 0.8rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .agent-stat:hover {
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .agent-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.6rem;
+            background: var(--secondary-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--primary-bg);
+            border-color: var(--accent-cyan);
+        }
+
+        /* Performance Charts */
+        .performance-section {
+            margin-bottom: 2rem;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .chart-container:hover {
+            border-color: rgba(0, 245, 212, 0.2);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-btn {
+            padding: 0.5rem 1rem;
+            background: var(--secondary-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+        }
+
+        .chart-btn.active {
+            background: var(--accent-cyan);
+            color: var(--primary-bg);
+            border-color: var(--accent-cyan);
+        }
+
+        .chart {
+            height: 300px;
+            position: relative;
+        }
+
+        /* Network Health */
+        .network-health {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .health-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .health-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 245, 212, 0.2);
+        }
+
+        .health-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+
+        .health-1 { background: rgba(0, 245, 212, 0.1); color: var(--accent-cyan); }
+        .health-2 { background: rgba(123, 97, 255, 0.1); color: var(--accent-purple); }
+        .health-3 { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+
+        .health-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .health-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+            }
+            
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .network-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .agents-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .network-health {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .network-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .network-health {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .status-indicator {
+                align-self: flex-start;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-robot logo-icon"></i>
+            <span>ARES</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="Live.html">Live Markets</a></li>
+                <li><a href="agents.html" class="active">Agent Network</a></li>
+                <li><a href="Analytic.html">Analytics</a></li>
+                <li><a href="docs.html">Documentation</a></li>
+            </ul>
+        </nav>
+        <div class="status-indicator">
+            <div class="pulse"></div>
+            <span>System Online</span>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>AGENT NETWORK</h1>
+        <p>Meet the AI agents powering the autonomous financial ecosystem. Monitor performance, track activities, and manage the network.</p>
+    </section>
+
+    <!-- Agent Network Container -->
+    <section class="agent-network">
+        <!-- Network Overview -->
+        <div class="network-overview">
+            <div class="overview-card overview-1">
+                <div class="overview-header">
+                    <div class="overview-title">Active Agents</div>
+                    <div class="overview-icon icon-1">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                </div>
+                <div class="overview-value">142</div>
+                <div class="overview-change change-positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+8.2%</span>
+                </div>
+            </div>
+
+            <div class="overview-card overview-2">
+                <div class="overview-header">
+                    <div class="overview-title">Network Uptime</div>
+                    <div class="overview-icon icon-2">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                </div>
+                <div class="overview-value">99.7%</div>
+                <div class="overview-change change-positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0.1%</span>
+                </div>
+            </div>
+
+            <div class="overview-card overview-3">
+                <div class="overview-header">
+                    <div class="overview-title">Avg. Response Time</div>
+                    <div class="overview-icon icon-3">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                </div>
+                <div class="overview-value">247 ms</div>
+                <div class="overview-change change-negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-12 ms</span>
+                </div>
+            </div>
+
+            <div class="overview-card overview-4">
+                <div class="overview-header">
+                    <div class="overview-title">Success Rate</div>
+                    <div class="overview-icon icon-4">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="overview-value">98.3%</div>
+                <div class="overview-change change-positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0.4%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Types Grid -->
+        <div class="agent-types">
+            <div class="section-header">
+                <h2 class="section-title">Agent Types</h2>
+                <div class="filter-controls">
+                    <button class="filter-btn active">All Agents</button>
+                    <button class="filter-btn">Online</button>
+                    <button class="filter-btn">High Performance</button>
+                    <button class="filter-btn">By Role</button>
+                </div>
+            </div>
+
+            <div class="agents-grid">
+                <!-- Risk Sensor Agent -->
+                <div class="agent-card agent-risk">
+                    <div class="agent-header">
+                        <div class="agent-avatar avatar-risk">RS</div>
+                        <div class="agent-info">
+                            <h3>Risk Sensor</h3>
+                            <div class="agent-role">Risk Detection & Analysis</div>
+                        </div>
+                        <div class="agent-status status-online">Online</div>
+                    </div>
+                    <p class="agent-description">Monitors global shipping routes for potential risks including weather, geopolitical events, and port conditions.</p>
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="stat-value">142</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">98.7%</div>
+                            <div class="stat-label">Accuracy</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">247ms</div>
+                            <div class="stat-label">Avg. Response</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">24/7</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-chart-line"></i>
+                            Performance
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-cog"></i>
+                            Configure
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-terminal"></i>
+                            Logs
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Market Maker Agent -->
+                <div class="agent-card agent-market">
+                    <div class="agent-header">
+                        <div class="agent-avatar avatar-market">MM</div>
+                        <div class="agent-info">
+                            <h3>Market Maker</h3>
+                            <div class="agent-role">Derivative Creation & Pricing</div>
+                        </div>
+                        <div class="agent-status status-online">Online</div>
+                    </div>
+                    <p class="agent-description">Creates and prices derivative contracts based on risk assessments and market conditions.</p>
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="stat-value">67</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">99.1%</div>
+                            <div class="stat-label">Efficiency</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">184ms</div>
+                            <div class="stat-label">Avg. Response</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">24/7</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-chart-line"></i>
+                            Performance
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-cog"></i>
+                            Configure
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-terminal"></i>
+                            Logs
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hedging Strategy Agent -->
+                <div class="agent-card agent-hedge">
+                    <div class="agent-header">
+                        <div class="agent-avatar avatar-hedge">HS</div>
+                        <div class="agent-info">
+                            <h3>Hedging Strategy</h3>
+                            <div class="agent-role">Risk Mitigation & Portfolio Management</div>
+                        </div>
+                        <div class="agent-status status-online">Online</div>
+                    </div>
+                    <p class="agent-description">Executes hedging strategies by purchasing derivatives to mitigate identified risks.</p>
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="stat-value">89</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">97.4%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">312ms</div>
+                            <div class="stat-label">Avg. Response</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">24/7</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-chart-line"></i>
+                            Performance
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-cog"></i>
+                            Configure
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-terminal"></i>
+                            Logs
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Settlement Oracle Agent -->
+                <div class="agent-card agent-settlement">
+                    <div class="agent-header">
+                        <div class="agent-avatar avatar-settlement">SO</div>
+                        <div class="agent-info">
+                            <h3>Settlement Oracle</h3>
+                            <div class="agent-role">Contract Resolution & Payout</div>
+                        </div>
+                        <div class="agent-status status-online">Online</div>
+                    </div>
+                    <p class="agent-description">Automatically resolves contracts based on real-world data and executes payouts.</p>
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="stat-value">24</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">99.7%</div>
+                            <div class="stat-label">Accuracy</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">528ms</div>
+                            <div class="stat-label">Avg. Response</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">24/7</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-chart-line"></i>
+                            Performance
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-cog"></i>
+                            Configure
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-terminal"></i>
+                            Logs
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Arbitrage Agent -->
+                <div class="agent-card agent-arbitrage">
+                    <div class="agent-header">
+                        <div class="agent-avatar avatar-arbitrage">AA</div>
+                        <div class="agent-info">
+                            <h3>Arbitrage Agent</h3>
+                            <div class="agent-role">Market Efficiency & Price Discovery</div>
+                        </div>
+                        <div class="agent-status status-online">Online</div>
+                    </div>
+                    <p class="agent-description">Identifies and exploits pricing inefficiencies across different risk markets.</p>
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="stat-value">35</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">96.2%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">194ms</div>
+                            <div class="stat-label">Avg. Response</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">24/7</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-chart-line"></i>
+                            Performance
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-cog"></i>
+                            Configure
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-terminal"></i>
+                            Logs
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Liquidity Agent -->
+                <div class="agent-card agent-liquidity">
+                    <div class="agent-header">
+                        <div class="agent-avatar avatar-liquidity">LA</div>
+                        <div class="agent-info">
+                            <h3>Liquidity Agent</h3>
+                            <div class="agent-role">Market Making & Order Book Management</div>
+                        </div>
+                        <div class="agent-status status-offline">Offline</div>
+                    </div>
+                    <p class="agent-description">Provides liquidity to ensure smooth functioning of derivative markets.</p>
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="stat-value">42</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">98.9%</div>
+                            <div class="stat-label">Efficiency</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">167ms</div>
+                            <div class="stat-label">Avg. Response</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="stat-value">23/7</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-chart-line"></i>
+                            Performance
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-cog"></i>
+                            Configure
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-terminal"></i>
+                            Logs
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Charts -->
+        <div class="performance-section">
+            <div class="section-header">
+                <h2 class="section-title">Agent Performance</h2>
+                <div class="chart-actions">
+                    <button class="chart-btn active">1D</button>
+                    <button class="chart-btn">1W</button>
+                    <button class="chart-btn">1M</button>
+                    <button class="chart-btn">1Y</button>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Agent Activity Timeline</div>
+                        <div class="chart-actions">
+                            <button class="chart-btn active">All</button>
+                            <button class="chart-btn">Risk</button>
+                            <button class="chart-btn">Market</button>
+                        </div>
+                    </div>
+                    <div class="chart">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Performance Distribution</div>
+                        <div class="chart-actions">
+                            <button class="chart-btn active">All</button>
+                            <button class="chart-btn">Top 10</button>
+                        </div>
+                    </div>
+                    <div class="chart">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Network Health -->
+        <div class="section-header">
+            <h2 class="section-title">Network Health</h2>
+        </div>
+        <div class="network-health">
+            <div class="health-card">
+                <div class="health-icon health-1">
+                    <i class="fas fa-server"></i>
+                </div>
+                <div class="health-value">99.4%</div>
+                <div class="health-label">Infrastructure Uptime</div>
+            </div>
+
+            <div class="health-card">
+                <div class="health-icon health-2">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="health-value">100%</div>
+                <div class="health-label">Security Status</div>
+            </div>
+
+            <div class="health-card">
+                <div class="health-icon health-3">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <div class="health-value">247 ms</div>
+                <div class="health-label">Avg. Latency</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Initialize Charts
+        function initializeCharts() {
+            // Activity Timeline Chart
+            const activityCtx = document.getElementById('activityChart').getContext('2d');
+            new Chart(activityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                    datasets: [
+                        {
+                            label: 'Risk Sensors',
+                            data: [65, 70, 75, 80, 75, 70, 65],
+                            borderColor: '#00f5d4',
+                            backgroundColor: 'rgba(0, 245, 212, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Market Makers',
+                            data: [45, 50, 55, 60, 65, 60, 55],
+                            borderColor: '#7b61ff',
+                            backgroundColor: 'rgba(123, 97, 255, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Hedging Agents',
+                            data: [35, 40, 45, 50, 55, 50, 45],
+                            borderColor: '#ec4899',
+                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Performance Distribution Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Risk Sensors', 'Market Makers', 'Hedging', 'Settlement', 'Arbitrage', 'Liquidity'],
+                    datasets: [{
+                        label: 'Performance Score',
+                        data: [98.7, 99.1, 97.4, 99.7, 96.2, 98.9],
+                        backgroundColor: [
+                            '#00f5d4',
+                            '#7b61ff',
+                            '#ec4899',
+                            '#f59e0b',
+                            '#8b5cf6',
+                            '#06b6d4'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Filter buttons functionality
+        function setupFilterButtons() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const chartButtons = document.querySelectorAll('.chart-btn');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons in the same group
+                    const parent = this.parentElement;
+                    const siblings = parent.querySelectorAll('.filter-btn');
+                    siblings.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                });
+            });
+
+            chartButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons in the same group
+                    const parent = this.parentElement;
+                    const siblings = parent.querySelectorAll('.chart-btn');
+                    siblings.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                });
+            });
+        }
+
+        // Action buttons functionality
+        function setupActionButtons() {
+            const actionButtons = document.querySelectorAll('.action-btn');
+            
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.textContent.trim();
+                    alert(`Action triggered: ${action}`);
+                    // In a real application, this would trigger specific functionality
+                });
+            });
+        }
+
+        // Simulate real-time updates
+        function simulateRealTimeUpdates() {
+            setInterval(() => {
+                // Update overview values with small random fluctuations
+                const overviewValues = document.querySelectorAll('.overview-value');
+                const overviewChanges = document.querySelectorAll('.overview-change');
+                
+                overviewValues.forEach((value, index) => {
+                    if (index === 0) { // Active Agents
+                        const currentValue = parseInt(value.textContent);
+                        const change = Math.floor(Math.random() * 3) - 1;
+                        const newValue = currentValue + change;
+                        value.textContent = newValue;
+                        
+                        // Update change indicator
+                        const changeElement = overviewChanges[index];
+                        const percentChange = (change / currentValue * 100).toFixed(1);
+                        changeElement.innerHTML = `<i class="fas fa-arrow-${change >= 0 ? 'up' : 'down'}"></i><span>${change >= 0 ? '+' : ''}${percentChange}%</span>`;
+                        changeElement.className = `overview-change ${change >= 0 ? 'change-positive' : 'change-negative'}`;
+                    }
+                    else if (index === 2) { // Avg. Response Time
+                        const currentValue = parseInt(value.textContent);
+                        const change = Math.floor(Math.random() * 10) - 5;
+                        const newValue = Math.max(100, currentValue + change);
+                        value.textContent = newValue + ' ms';
+                        
+                        // Update change indicator
+                        const changeElement = overviewChanges[index];
+                        changeElement.innerHTML = `<i class="fas fa-arrow-${change <= 0 ? 'up' : 'down'}"></i><span>${change <= 0 ? '+' : ''}${change} ms</span>`;
+                        changeElement.className = `overview-change ${change <= 0 ? 'change-positive' : 'change-negative'}`;
+                    }
+                });
+            }, 5000);
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            setupFilterButtons();
+            setupActionButtons();
+            simulateRealTimeUpdates();
+        });
+    </script>
+</body>
+</html>
